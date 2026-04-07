@@ -5,9 +5,9 @@ if [ -z "$1" ]; then
     exit 1
 fi
 
-CURRENT_DATE=$(date +%Y-%m-%d)
-RETENTION_DATE=$(date -d "11 days ago" +%Y-%m-%d)
-RECENT_DATE=$(date -d "5 days ago" +%Y-%m-%d)
+CURRENT_DATE=$(date +%Y-%m-%d_%H%M)
+RETENTION_DATE=$(date -d "11 days ago" +%Y-%m-%d_%H%M)
+RECENT_DATE=$(date -d "5 days ago" +%Y-%m-%d_%H%M)
 
 ROOT="$1"
 
@@ -24,7 +24,8 @@ createFiles() {
     make_file "important.log.txt"
     make_file "database.log.backup.csv"
     make_file "web server.log.info"
-
+	make_file ".hidden.log.tmp"
+	
 	# File already renamed and gzipped
 	touch "$dir/already_processed.$CURRENT_DATE.log.old.gz"
 
@@ -32,15 +33,12 @@ createFiles() {
 	touch -d "11 days ago" "$dir/expired_archive.$RETENTION_DATE.log.bak.gz"
 
 	# Recent gzip file -> kept
-	touch -d "5 days ago" "$dir/recent_archive.$RECENT_DATE.log.bak.gz"
+	touch -d "5 days ago" "$dir/recent_archive.$RECENT_DATE.log.bak.gz" 
 
-	# Old, not gzipped file -> kept for safety measure
-	touch -d "30 days ago" "$dir/very_old_uncompressed.log.old" 
-	
+	# These files do not meet criteria
 	touch "$dir/ignore.log"
 	touch "$dir/manual.txt"
 	touch "$dir/log.txt.old"
-	touch "$dir/.hidden.log.tmp"
 }
 
 mkdir -p "$ROOT"
